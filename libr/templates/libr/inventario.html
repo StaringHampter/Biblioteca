@@ -1,0 +1,76 @@
+{% extends "libr/layout.html" %}
+{% load static %}
+
+
+{% block title %}<h1>Inventario</h1>{% endblock %}
+{% block script %}<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmarBorrado(e) {
+    e.preventDefault();
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Esto borrará el libro permanentemente de la base de datos.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, borrar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            e.target.submit();
+        }
+    });
+}
+</script>{% endblock %}
+{% block body %}
+<form class="search-form" action="{% url 'buscar' %}" method="POST">
+{% csrf_token %}
+<input placeholder="Nombre/autor/ISBN" type="text" name="query" id="query"/>
+<button type="submit" class="button-89">Buscar</button>
+<a href="{% url 'inventario' %}"<button class="btn-secondary">Regresar</button></a>
+
+</form>
+{% if mensaje %}
+	<div class="mensaje">{{ mensaje }}</div>
+{% endif %}
+	<ul class="libros-lista">
+	{% for libro in libros %}
+		<div id="libro-container">
+			<li class="libro-card">
+			<h2>{{ libro.titulo }}</h2>
+			<p>Autor: {{ libro.autor }}<p>
+			<p>Año de publicación: {{ libro.año }}</p>
+			<p>Cantidad en stock: {{ libro.cantidad }}</p>
+			<p>Ver en la web: <a href="{{ libro.link }}" target="_blank" class="btn-secondary">Visualizar</a></p>
+			<p>ISBN: {{ libro.isbn }}</p>
+			<p>Número de estante: {{ libro.estante }}</p>
+			<p>Número de estantería: {{ libro.estanteria }}</p>
+			<a href="{% url 'modificar' libro.id %}"><button class="btn-secondary">Modificar</button></a>
+			<form method="POST" action="{% url 'eliminar' libro.id %}" onsubmit="confirmarBorrado(event)">
+				{% csrf_token %}
+				<button class="btn-danger" onclick="confirmarBorrado()" type="submit">Eliminar</button>
+			</form>
+		</div><li>
+	{% empty %}
+		<li><div class="mensaje">No hay libros agregados aún.</div></li>
+	{% endfor %}
+	</ul>
+	<div class="pagination">
+    <span class="step-links">
+        {% if libros.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ libros.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ libros.number }} of {{ libros.paginator.num_pages }}.
+        </span>
+
+        {% if libros.has_next %}
+            <a href="?page={{ libros.next_page_number }}">next</a>
+            <a href="?page={{ libros.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+	<a href="{% url 'generar_pdf' %}"><button class="btn-gen">Generar PDF</button></a>
+{% endblock %}
+{% block credito %}{% endblock %}

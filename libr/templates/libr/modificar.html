@@ -1,0 +1,42 @@
+
+{% extends "libr/layout.html" %}
+{% load static %}
+{% block title %}{% endblock %}
+<head>
+<link rel="stylesheet" href="{% static 'libr/styles.css' %}">
+{% block script %}<script src="{% static 'libr/edit.js' %}"></script>{% endblock %}
+<h1>Editando Libro</h1>
+</head>
+
+
+
+{% block body %}
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+	<form>
+	{% csrf_token %}
+        <div id="confirmar-libro">
+               
+                <em>Título: </em><input type="text" value="{{ libro.titulo }}" id="titulo"><br><br>
+                <em>Autor: </em><input type="text" value="{{ libro.autor }}" id="autor"><br><br>
+                <em>Año de publicación: </em><input type="text" value="{{ libro.año }}" id="año"><br><br>
+                <em>ISBN: </em><input type="text" value="{{ libro.isbn }}" id="isbn"><br><br>
+                <em>Enlace: </em><input type="text" value="{{ libro.link }}" id="link"><br><br>
+                <em>Cantidad en stock: </em><input type="integer" id="cantidad" value="{{ libro.cantidad }}"><br><br>
+		<em>Número de estante: </em><input  id="estante" value="{{ libro.estante }}"><br><br>
+		<em>Número de estantería: </em><input  id="estanteria" value="{{ libro.estanteria }}"><br><br>
+                <button type="button" id="editBtn" data-libro-id="{{ libro.id }}" class="btn-primary">Guardar en el inventario</button>
+	</form>             
+	<a href="{% url 'inventario' %}" class="btn-primary">Salir</a>
+        </div>
+
+
+
+{% endblock %}

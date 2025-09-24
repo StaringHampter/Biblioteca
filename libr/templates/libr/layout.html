@@ -1,0 +1,38 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+	<meta charset="UTF-8">
+	<title>{% block title %}Biblioteca Olga Polanco{% endblock %}</title>
+	<link rel="stylesheet" href="{% static 'libr/styles.css' %}">	
+
+	{% block script %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<div id="navigator-menu">
+		<ul id="navigator-ul">
+                <li id="nav-li"><div id="inventario"><a href="{% url 'inventario' %}">Inventario</a></div></li>
+                <li id="nav-li"><a href="{% url 'prestar_view' %}"><div id="prestar-libros-menu">Prestar</div></a></li>
+                <li id="nav-li"><div id="prestamos"><a href="{% url 'prestamos_view' %}">Prestamos</div></a></li>
+                <li id="nav-li"><div id="agregar-libros"><a href="{% url 'agregar_libros' %}">Agregar libros</a>
+                </div></li>
+		<li id="nav-li"><div><a href="{% url 'administrar_perfiles' %}"</div>Administrar perfiles</a><li>
+		<li id="nav-li"><div><a href="{% url 'logout' %}"</div>Finalizar sesión</a><li>
+		<li id="nav-li"><img src="{% static 'libr/images.png' %}"<li>
+		</ul>
+        </div>
+{% endif %}
+{% block body %}
+{% endblock %}
+</body>
+
+<footer>
+{% block credito %}
+<p>Por: Keyra A. del Aguila</p>
+{% endblock %}
+</footer>
+
+</html>

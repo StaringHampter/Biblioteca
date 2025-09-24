@@ -1,0 +1,14 @@
+{% extends "libr/layout.html" %}
+{% block body %}
+<div class="login-container">
+  <h2>Iniciar sesión</h2>
+  {% if form.errors %}<p class="error">Usuario o contraseña inválidos.</p>{% endif %}
+  <form method="POST" class="form-group">
+    {% csrf_token %}
+    {{ form.username.label_tag }} {{ form.username }}<br>
+    {{ form.password.label_tag }} {{ form.password }}<br><br>
+    <button type="submit" class="button-login">Entrar</button>
+  </form>
+  <p><a href="{% url 'password_reset' %}">¿Olvidaste la contraseña?</a></p>
+</div>
+{% endblock %}

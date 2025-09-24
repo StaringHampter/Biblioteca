@@ -1,0 +1,12 @@
+{% extends 'libr/layout.html' %}
+{% load static %}
+
+
+{% block body %}
+	<div class="acciones-usuario">
+		<a href="{% url 'modificar_perfiles' usuario.codigo_barras %}" class="btn btn-primary">Modificar</a>
+		<a href="{% url 'mostrar_pdf' usuario.codigo_barras %}" class="btn btn-secondary">Ver PDF</a>
+		<a href="{% url 'eliminar_usuario' usuario.codigo_barras %}" class="btn btn-danger">Eliminar</a>
+		<a href="{% url 'ver_prestamos' usuario.codigo_barras %}"  class="btn btn-info">Consultar libros prestados</a>	
+	</div>
+{% endblock %}

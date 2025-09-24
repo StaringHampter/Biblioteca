@@ -1,0 +1,46 @@
+{% extends 'libr/layout.html' %}
+{% load static %}
+{% block title%}<h1>Gestión de perfiles</h1>{% endblock %}
+
+{% block body %}
+
+	<div id="perfiles-menu">
+		<a href="{% url 'opciones_perfiles_view' %}" class="button-63">Crear Perfil</a>
+		<form method="GET" action="{% url 'buscar_usuario' %}">
+			<input type="text" placeholder="Nombre del alumno" name="nombre"/>
+			<button type="submit" class="btn-primary">Buscar</button>
+		</form>		
+	</div>
+
+	<ul class="lista-usuarios">
+	{% for usuario in page_obj %}
+		<li>		
+		<a href="{% url 'gestionar_perfil' usuario.codigo_barras %}" class="usuario-item">
+			{{ usuario.nombre }}
+		</a><br>
+		</li>
+		</ul>
+	{% endfor %}
+
+
+	
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+
+{% endblock %}

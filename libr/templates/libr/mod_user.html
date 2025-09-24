@@ -1,0 +1,28 @@
+{% extends "libr/perfil.html" %}
+{% load static %}
+
+
+{% block title %} {% endblock %}
+
+{% block body %}
+{% if messages %}
+	{% for message in messages %}
+		<div class="message">
+			{{ message }}	
+		</div>
+	{% endfor %}
+{% endif %}
+<form action="{% url 'modificar_perfiles' usuario.codigo_barras %}" method="POST" class="perfil-form">
+{% csrf_token %}
+	<input type="hidden" name="_method" value="PUT">
+        <input type="text" id="nombre" placeholder="nombre" name="nombre" class="inputFields" value="{{usuario.nombre}}">
+        {% if grados.as_p %}
+                {{ grados.as_p }}
+        {% endif %}
+        <button type="submit" id="estudiante_perfil" class="btn-63">Actualizar</button>
+</form>
+<a href="{% url 'administrar_perfiles' %}" class="btn-salir"><button>Salir</button></a>
+
+
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "libr/layout.html" %}
+{% load static %}
+
+{% block title %}<h1>Creando el perfil del estudiante</h1> {% endblock %}
+
+{% block body %}
+<form action="{% url 'crear_perfil' id %}" method="POST" class="search-form">
+{% csrf_token %}
+	<input type="text" id="nombre" placeholder="Nombre" name="nombre">
+	{% if grados.as_p %}
+		{{ grados.as_p }}
+	{% endif %}
+	<button type="submit" id="estudiante_perfil" class="btn-primary">Agregar</button>
+</form>
+<a href="{% url 'administrar_perfiles' %}" class="btn-primary">Salir</a>
+
+
+
+{% endblock %}

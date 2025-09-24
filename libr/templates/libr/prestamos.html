@@ -1,0 +1,98 @@
+{% extends "libr/layout.html"%}
+{% load static %}
+
+{% block title %}{% endblock %}
+{% block script %}<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmarBorrado(e) {
+    e.preventDefault();
+    Swal.fire({
+        title: "¿Está seguro?",
+        text: "Esto borrará todo el historial de préstamos.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, borrar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            e.target.submit();
+        }
+    });
+}
+</script>{% endblock %}
+{% block body %}
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+            #{{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+<section>
+<form method="GET" action="{% url 'prestamos_view' %}" class="filtro">
+<select name="estado" onchange="this.form.submit()">
+	<option value="">Todos</option>
+	<option value="devueltos" {% if request.GET.estado == "devueltos" %}selected{% endif %}>Devueltos</option>
+	<option value="pendientes" {% if request.GET.estado == "pendientes" %}selected{% endif %}>Pendientes</option>
+</select>
+
+</form>
+</section>
+
+
+<section>
+<ul class="libros-lista">
+{% for prestamo in prestamos %}
+	<div id="libro-container">
+		<li class="libro-card">
+			<h2>Libro: {{prestamo.obj.libro.titulo}}</h2>
+			{% if prestamo.obj.usuario.nombre %}	
+				<p>Prestado por: {{prestamo.obj.usuario.nombre}}</p>
+			{% else %}
+				<p>Prestado por: {{prestamo.obj.maestro.nombre}}</p>
+			{% endif %}
+			<p>Fecha de préstamo: {{prestamo.obj.fecha_prestamo}}</p>
+			{% if prestamo.obj.cantidad %}
+				<p>Cantidad: {{ prestamo.obj.cantidad }}</p>
+			{% endif %}
+			{% if prestamo.obj.devuelto %}
+				<p>Devuelto</p>
+			{% else %}
+				<form method="POST" action="{% url 'devolver' prestamo.tipo prestamo.obj.id %}">
+				{% csrf_token %}
+				<button type="submit" class="btn-primary">Devolver</button>
+				</form>
+			{% endif %}	
+		</li>
+	</div>
+{% empty %}
+	<li>
+		<p>No hay prestamos vigentes.</p>
+	</li>
+{% endfor %}
+</ul>
+<form method="POST" action="{% url 'borrar_historial' %}" onsubmit="confirmarBorrado(event)">
+{% csrf_token %}
+<button type="submit" class="btn-primary">Borrar Historial</button>
+</section>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if prestamos.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ prestamos.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ prestamos.number }} of {{ prestamos.paginator.num_pages }}.
+        </span>
+
+        {% if prestamos.has_next %}
+            <a href="?page={{ prestamos.next_page_number }}">next</a>
+            <a href="?page={{ prestamos.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'libr/layout.html' %}
+{% load static %}
+
+{% block title %}<link rel="stylesheet" href="libr/styles.css"> {% endblock %}
+
+{% block body %}
+<h1>ROL:</h1>
+<div class="opciones">
+	<a href="{% url 'crear_perfil' 1 %}" class="rol">Estudiante</a>
+	<a href="{% url 'crear_perfil' 2 %}" class="rol">Maestro</a>
+</div>
+
+{% endblock %}

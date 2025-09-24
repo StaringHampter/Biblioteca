@@ -1,0 +1,49 @@
+{% extends "libr/layout.html" %}
+{load static}
+{% block title %}{% endblock %}
+
+
+{% block body %}
+{% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+<ul class="libros-lista">
+{% for prestamo in prestamos %}
+                <div id="libro-container">
+			<li class="libro-card">
+                        <h2>Libro: {{prestamo.obj.libro.titulo}}</h2>
+                        {% if prestamo.obj.usuario.nombre %}
+                                <p>Prestado por: {{prestamo.obj.usuario.nombre}}</p>
+                        {% else %}
+                                <p>Prestado por: {{prestamo.obj.maestro.nombre}}</p>
+                        {% endif %}
+                        <p>Fecha de préstamo: {{prestamo.obj.fecha_prestamo}}</p>
+                        {% if prestamo.obj.cantidad %}
+                                <p>Cantidad: {{ prestamo.obj.cantidad }}</p>
+                        {% endif %}
+                        {% if prestamo.obj.devuelto %}
+                                <p>Devuelto</p>
+                        {% else %}
+                                <form method="POST" action="{% url 'devolver' prestamo.tipo prestamo.obj.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-primary">Devolver</button>
+                                </form>
+                        {% endif %}
+                </div>
+        </li>
+</ul>
+{% empty %}
+	<ul>
+		<li>No ha realizado préstamo alguno.</li>
+	</ul>
+
+{% endfor %}
+
+
+
+
+{% endblock %}

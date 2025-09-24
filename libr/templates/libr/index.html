@@ -1,0 +1,19 @@
+{% extends 'libr/layout.html' %}
+{% load static %}
+{% block title %}{% endblock %}
+{% block body %}
+{% if mensaje %}
+        <div class="mensaje">{{ mensaje }}</div>
+{% endif %}
+	<h1>Bienvenido a la Biblioteca Olga Polanco</h1>
+	<a href="{% url 'login' %}" class="button-89">Iniciar sesión</a>
+{% endblock %}
+
+
+
+
+
+
+
+
+</html>

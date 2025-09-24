@@ -1,0 +1,22 @@
+{% extends "libr/layout.html" %}
+{% load static %}
+
+{% block title %}Agregando Libro{% endblock %}
+
+{% block script %}<script src="{% static 'libr/script.js' %}"></script>{% endblock %}
+
+{% block body %}
+<div class="page">
+<div class="page-title">
+{% if mensaje %}
+	<div class="mensaje">{{ mensaje }}<a href="{% url 'agregar_manualmente' %}" class="link-sec"> Agregar Manualmente?</a></div>
+{% endif %}
+<form action="{% url 'buscar_libro' %}" id="ISBN-Form" name="ISBN-Form" class="search-form" method="POST">
+{% csrf_token %}
+<input type="text" name="SearchISBN" id="SearchISBN"/><input class="btn-secondary" type="submit" value="Buscar" name="submit"/>
+<label for="SearchISBN">Escanee el código</label>
+</form>
+<div id="Resultados"></div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+
+{% extends "libr/layout.html" %}
+{% load static %}
+{% block title %}
+<head>
+<link rel="stylesheet" href="{% static 'libr/styles.css' %}">
+<script src="{% static 'libr/script.js' %}"></script>
+<h1>Confirmando Libro</h1>
+</head>
+
+
+{% endblock %}
+
+
+{% block body %}
+	<div id="confirmar-libro">
+		<form action="{% url 'agregarBaseDatos' %}" method="POST" id="formBD">
+		{% csrf_token %}
+		<em>Título: </em><input type="text" value="{{ libro.titulo }}" name="titulo"><br><br>
+		<em>Autor: </em><input type="text" value="{{ libro.autor }}" name="autor"><br><br>
+		<em>Año de publicación: </em><input type="text" value="{{ libro.año }}" name="año"><br><br>
+		<em>ISBN: </em><input type="text" value="{{ libro.isbn }}" name="isbn"><br><br>
+		<em>Enlace: </em><input type="text" value="{{ libro.link }}" name="link"><br><br>
+		<em>Cantidad en stock: </em><input type="number" name="cantidad"><br><br>
+		<em>Número de estantería: </em><input type="number" name="estanteria"><br><br>
+		<em>Número de estante: </em><input type="number" name="estante"><br><br> 
+		<button type="submit" class="btn-primary">Guardar en el inventario</button>
+		</form>
+	</div>
+
+
+
+{% endblock %}
