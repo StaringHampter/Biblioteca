@@ -4,6 +4,17 @@
 {% block title %}<h1>Creando el perfil del estudiante</h1> {% endblock %}
 
 {% block body %}
+
+{% if messages %}
+        {% for message in messages %}
+                <div class="message">
+                        {{ message }}
+                </div>
+        {% endfor %}
+{% endif %}
+{% if mensaje %}
+	<div class="mensaje">{{ mensaje }}</div>
+{% endif %}
 <form action="{% url 'crear_perfil' id %}" method="POST" class="search-form">
 {% csrf_token %}
 	<input type="text" id="nombre" placeholder="Nombre" name="nombre">

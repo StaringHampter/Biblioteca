@@ -5,12 +5,12 @@
 
 {% block body %}
 {% if mensaje %}
-        <div class="mensaje">{{ mensaje }}<a href="{% url 'agregar_manualmente' %}"> Agregar Manualmente?</a></div>
+        <div class="mensaje">{{ mensaje }}</div>
 {% endif %}
 
 <div class="forms">
 {% if es_profe %}
-	<h1>Maestro identificado</h1>
+	<div class="mensaje">Maestro identificado</div>
 	<form action="{% url 'prestamo_maestro' libro.isbn profe.codigo_barras %}" name="form" method="POST" class="form-prestamo">
 	{% csrf_token %}
 	<div class="campo">
@@ -18,13 +18,13 @@
 		<label for="libro">Escanee el código del libro</label>
 	</div>
 	<div class="campo">	
-	<input type="text" class="inputFields" name="codigo_usuario" id="usuario" value="{{profe.codigo_barras}}"/>
-	<label for="usuario">Escanee el código del usuario</label>
+		<input type="text" class="inputFields" name="codigo_usuario" id="usuario" value="{{profe.codigo_barras}}"/>
+		<label for="usuario">Escanee el código del usuario</label>
 	</div>
 	<div class="campo">
-	<input class="btn-primary" type="submit" value="Asignar" name="submit" class="inputFields"/>
 	<input type="number" name="cantidad" id="cantidad" class="inputFields"/>
         <label for="cantidad">Cantidad</label>
+	<input class="btn-primary" type="submit" value="Asignar" name="submit" class="inputFields"/>
 	</div>
 	</form>
 

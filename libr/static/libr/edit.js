@@ -2,12 +2,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const btn = document.getElementById("editBtn");
 
     btn.addEventListener('click', (event) => {
-        event.preventDefault();  // 👈 evita que el form haga submit normal
+        event.preventDefault(); 
 
         const id = btn.getAttribute("data-libro-id");
 
         fetch(`/modificar/${id}/`, {
-            method: "POST",  // Django entiende mejor POST que PUT
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRFToken": getCookie('csrftoken')
@@ -26,9 +26,13 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            alert(data.mensaje || "Guardado con éxito 🎉");
+            alert(data.mensaje || "Libro modificado con éxito.");
         })
-        .catch(error => console.error(error));
+        .catch(error => {
+		console.error(error);
+		alert(data.mensaje || "Hubo un error. Puede que un campo esté vacío.")
+
+	});
     });
 });
 
@@ -44,5 +48,5 @@ function getCookie(name) {
             }
         }
     }
-    return cookieV;  // 👈 ¡esto faltaba!
+    return cookieV; 
 }

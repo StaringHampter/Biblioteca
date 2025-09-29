@@ -133,7 +133,7 @@ h1:before {
     font-size: 15px;
 }
 
-/* Formulario */
+
 .perfil-form {
     display: flex;
     flex-direction: column;
@@ -177,7 +177,7 @@ h1:before {
     background: #357abd;
 }
 
-/* Botón salir */
+
 .btn-salir {
     display: inline-block;
     margin-top: 15px;
@@ -196,15 +196,15 @@ h1:before {
 
 img {
     position: absolute;
-  top: 10px;     /* separación desde arriba */
-  right: 10px;   /* separación desde la derecha */
-  width: 150px;   /* tamaño opcional */
+  top: 10px;     
+  right: 10px;   
+  width: 150px;   
   height: auto;
 }
 
 .button-89 {
-  --b: 3px;   /* border thickness */
-  --s: .45em; /* size of the corner */
+  --b: 3px; 
+  --s: .45em; 
   --color: #373B44;
   
   padding: calc(.5em + var(--s)) calc(.9em + var(--s));
@@ -307,19 +307,19 @@ img {
 .btn-primary {
 	width: auto;
     padding: 10px 20px;
-    background-color: #4CAF50; /* verde */
+    background-color: #4CAF50; 
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
     margin-top: 10px;
-    align-self: flex-start; /* opcional, lo alinea al inicio del contenedor flex */
+    align-self: flex-start; 
     transition: background-color 0.3s;
 }
 
 .btn-primary:hover {
-    background-color: #45a049; /* un verde más oscuro al pasar el mouse */
+    background-color: #45a049; 
 }
 
 
@@ -328,7 +328,7 @@ img {
     display: flex;
     flex-direction: column;
     margin-bottom: 15px;
-    width: 400px; /* ancho del contenedor */
+    width: 400px; 
 }
 
 .campo label {
@@ -538,11 +538,11 @@ input {
 
 
 .filtro {
-    background: #f8f9fa;         /* fondo suave */
+    background: #f8f9fa;         
     padding: 15px 20px;
     border-radius: 10px;
-    max-width: 300px;            /* ancho razonable */
-    margin: 20px auto;           /* centrado */
+    max-width: 300px;            
+    margin: 20px auto;        
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     display: flex;
     justify-content: center;
@@ -607,7 +607,7 @@ input {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  gap: 15px; /* espacio entre campos */
+  gap: 15px; 
 }
 
 .titulo {
@@ -620,15 +620,15 @@ input {
 
 
 #confirmar-libro {
-  max-width: 400px; /* No más ancho que 400px */
-  margin: 30px auto; /* Centrado */
+  max-width: 400px; 
+  margin: 30px auto; 
   background: white;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Sombrilla ligera */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
 }
 
-/* Título */
+
 #confirmar-libro h2 {
   margin-bottom: 20px;
   font-size: 1.3rem;
@@ -636,15 +636,15 @@ input {
   text-align: center;
 }
 
-/* Etiquetas */
+
 #confirmar-libro label {
-  display: block; /* Que cada etiqueta ocupe una fila */
+  display: block; 
   margin-bottom: 5px;
   font-weight: bold;
   color: #444;
 }
 
-/* Campos de texto */
+
 #confirmar-libro input[type="text"],
 #confirmar-libro input[type="number"],
 #confirmar-libro input[type="url"] {
@@ -653,12 +653,12 @@ input {
   margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  box-sizing: border-box; /* Incluye padding en el ancho */
+  box-sizing: border-box; 
 }
 
-/* Botón principal */
+
 #confirmar-libro .btn-primary {
-  background-color: #28a745; /* Verde de acción */
+  background-color: #28a745; 
   color: white;
   border: none;
   padding: 10px;
@@ -669,7 +669,7 @@ input {
 }
 
 #confirmar-libro .btn-primary:hover {
-  background-color: #218838; /* Verde más oscuro al pasar el mouse */
+  background-color: #218838; 
 }
 
 
@@ -689,18 +689,18 @@ input {
 }
 
 
-/* General */
+
 body {
-  font-family: Arial, sans-serif; /* Fuente clara y común */
-  background-color: #9fafa1; /* Color de fondo muy suave */
+  font-family: Arial, sans-serif; 
+  background-color: #9fafa1; 
   margin: 20px;
   color: #333;
 }
 
-/* Formulario de búsqueda */
+
 .search-form {
-  display: flex; /* Los elementos en fila */
-  gap: 10px; /* Separación entre input y botones */
+  display: flex; 
+  gap: 10px; 
   margin-bottom: 20px;
   align-items: center;
 }
@@ -713,11 +713,11 @@ body {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  flex: 1; /* Que se estire al ancho disponible */
+  flex: 1; 
 }
 
 .btn-primary {
-  background-color: #007bff; /* Azul amigable */
+  background-color: #007bff;
   color: white;
   border: none;
   padding: 8px 14px;
@@ -727,7 +727,7 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: #0056b3; /* Azul más oscuro al pasar el mouse */
+  background-color: #0056b3; 
 }
 
 .btn-secondary {
@@ -735,7 +735,7 @@ body {
   color: white;
   padding: 8px 14px;
   border-radius: 6px;
-  text-decoration: none; /* Quita el subrayado */
+  text-decoration: none; 
   display: inline-block;
 }
 
@@ -755,7 +755,7 @@ body {
   background-color: #a71d2a;
 }
 
-/* Mensajes */
+
 .mensaje {
   background-color: #ffeeba;
   border: 1px solid #ffeeba;
@@ -764,9 +764,9 @@ body {
   margin-bottom: 15px;
 }
 
-/* Lista de libros */
+
 .libros-lista {
-  list-style: none; /* Quita los puntitos */
+  list-style: none; 
   padding: 0;
 }
 
@@ -776,7 +776,7 @@ body {
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 15px;
-  box-shadow: 0px 2px 5px rgba(0,0,0,0.1); /* Sombrilla ligera */
+  box-shadow: 0px 2px 5px rgba(0,0,0,0.1); 
 }
 
 .libro-card h2 {

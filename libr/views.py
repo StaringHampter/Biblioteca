@@ -22,6 +22,8 @@ from reportlab.pdfgen import canvas
 from django.core.paginator import Paginator
 from django.utils.text import slugify
 # Create your views here.
+
+#Posible sistema de logins futuro
 def login_view(request):
 	if request.method == "POST":
 		username = request.POST["username"]
@@ -54,19 +56,19 @@ def login_view(request):
 
 	return render(request, "libr/login.html")
 
-ALLOWED_USERNAME = "bibliotecario"   # el único username permitido
-PASSWORD = "admin"
+ALLOWED_USERNAME = "bibliotecario"   #admin
 
+#Login con usuario maestro/admin
 class SingleUserLoginView(LoginView):
 	template_name = "libr/login.html"
 
 	def form_valid(self, form):
 		username = form.cleaned_data.get('username')
 		password = form.cleaned_data.get('password')
-		if username != ALLOWED_USERNAME and password != PASSWORD:
+		if username != ALLOWED_USERNAME:
 			form.add_error(None, "Acceso denegado.")
 			return self.form_invalid(form)
-		return super().form_valid(form)   # el único username permitido
+		return super().form_valid(form)
 
 def logout_view(request):
         logout(request)
@@ -78,10 +80,11 @@ def index(request):
 
 
 def agregar_libro(request):
-	if request.method == 'POST':
-		messages.error(request, "Método incorrecto. La operación pudo haber sido alterada......")
 	return render(request, "libr/add_books.html")
 	
+
+#Trae los datos del sitio y los retorna en formato json
+@login_required
 @csrf_exempt
 def buscar_libro(request):
 	isbn = request.POST.get("SearchISBN")
@@ -102,10 +105,12 @@ def buscar_libro(request):
 			)
 		print(resultados)
 		request.session["resultados"] = resultados
+
 		return JsonResponse({ "resultados": resultados, "exito":True })
 	except Exception as e:
 		return JsonResponse({"error": str(e)}, status=500)
 
+#Filtra en base a la query al usuario
 def buscar_usuario(request):
 	mensaje = None
 	if request.method == "GET":
@@ -127,6 +132,7 @@ def buscar_usuario(request):
 	return render(request, "libr/admin.html", {"page_obj":resp, "message": mensaje})
 
 
+#Renderiza todos los libros
 def inventario(request):
 	libros = Libro.objects.all().order_by('titulo')
 	p = Paginator(libros, 10)
@@ -136,7 +142,8 @@ def inventario(request):
 	mensaje = None
 	return render(request, "libr/inventario.html", {"libros": libros, "mensaje":mensaje})
 
-
+#JS les da un indice a los resultados del API, esta función pasa los datos del libro escogido a la plantilla para revisar y agregar antes de ingresarlo a la base de datos
+@login_required
 @csrf_exempt
 def confirmar_libro(request, index):
 	resultados = request.session.get("resultados", [])
@@ -160,11 +167,9 @@ def agregarBaseDatos(request):
 		if all([titulo, autor, año, isbn, link, cantidad, estante, estanteria]) != None:
 			mensaje = ""
 			try:
-				print("this ok")
 				Libro.objects.create(titulo=titulo, autor=autor, isbn=isbn, año=año, link=link, cantidad=cantidad, estante=estante,
 				estanteria=estanteria)
 				mensaje = "Libro Guardado con Éxito"
-				print("agregado")
 			except Exception as e:
 				mensaje = f"Error al agregar a la base de datos. Algún campo está vacío. Por favor, intente de nuevo."
 				print(e)
@@ -172,8 +177,9 @@ def agregarBaseDatos(request):
 				return render(request, "libr/index.html", {"mensaje": mensaje})
 		else:
 			return HttpResponse('Algún campo está vacío. Por favor revise de nuevo.')
-#		messages.error(request, "Método incorrecto. La operación pudo haber sido alterada.")
 		return render(request, "libr/inventario.html")
+
+#Trae los datos del sitio, los retorna en formato json y guarda dentro de la sesión
 @csrf_exempt
 def buscar_js(request):
 	if request.method == "POST":
@@ -205,36 +211,43 @@ def buscar_js(request):
 		except Exception as e:
 			return JsonResponse({"error": str(e)}, status=500)
 
+@login_required
 @csrf_exempt
 def modificar(request, id):
 	if id > 0:
 		libro = Libro.objects.get(id=id)
-		print(libro.titulo)
-		print("DEBUG:", libro.id, libro.titulo, libro.autor, libro.cantidad)
 		mensaje = ""
 		if request.method in ["POST", "PUT"]:
 			try:
 				data = json.loads(request.body)
-				print("book")
 				libro.titulo = data.get("titulo", libro.titulo)
 				libro.autor = data.get("autor", libro.autor)
-				libro.año = data.get("año", libro.año)
-				libro.cantidad = data.get("cantidad", libro.cantidad)
-				libro.isbn = data.get("isbn", libro.isbn)
 				libro.link = data.get("link", libro.link)
-				libro.estante = data.get("estante", libro.estante)
-				libro.estanteria = data.get("estanteria", libro.estanteria)
-				libro.save()
-				print(libro.estante)
-				return JsonResponse({"mensaje": "Actualización realizada correctamente."})
-				messages.success("Actualización realizada correctamente.")
+				campos = ["año", "cantidad", "estante", "isbn", "estanteria"]
+				if all(data.get(campo) not in [None, ''] for campo in campos):
+					libro.año = data.get("año", libro.año)
+					libro.cantidad = data.get("cantidad", libro.cantidad)
+					libro.isbn = data.get("isbn", libro.isbn)
+			
+					libro.estante = data.get("estante", libro.estante)
+					libro.estanteria = data.get("estanteria", libro.estanteria)
+				else:
+					return render(request, "libr/modificar.html" ,{"libro": libro, "mensaje": "Un campo está vacío."})
+				try:
+					libro.save()
+					return JsonResponse({"mensaje": "Actualización realizada correctamente."})
+					mensaje = "Actualización realizada correctamente."
+				except Exception as e:
+					mensaje = "Un campo está vacío."
+					return JsonResponse({"error": str(e)})
 			except Exception as e:
-				return JsonResponse({"error": e})
-				print(e)
+				mensaje = "Un campo está vacío."
+				return JsonResponse({"error": str(e)})
 	return render(request, "libr/modificar.html",{"libro": libro, "mensaje": mensaje})
 
-
+@login_required
 def agregar_manualmente(request):
+	mensaje = None
 	if request.method == "POST":
 		titulo = request.POST.get("titulo")
 		autor = request.POST.get("autor")
@@ -244,10 +257,14 @@ def agregar_manualmente(request):
 		cantidad = request.POST.get("cantidad")
 		estante = request.POST.get("estante")
 		estanteria = request.POST.get("estanteria")
-		Libro.objects.create(titulo=titulo, autor=autor, isbn=isbn, año=año, link=link, cantidad=cantidad, estante=estante, estanteria=estanteria)
-	return render(request, "libr/agregar.html", {"mensaje": "Libro guardado exitosamente."})
+		try:
+			Libro.objects.create(titulo=titulo, autor=autor, isbn=isbn, año=año, link=link, cantidad=cantidad, estante=estante, estanteria=estanteria)
+			mensaje = "Libro agregado exitosamente."
+		except Exception as e:
+			mensaje = "Algún campo está vacío o es muy largo."
+	return render(request, "libr/agregar.html", {"mensaje": mensaje})
 
-
+@login_required
 def eliminar(request, id):
 	mensaje = ""
 	libro = Libro.objects.get(id=id)
@@ -259,6 +276,7 @@ def eliminar(request, id):
 			mensaje = "Libro no encontrado."
 	return redirect('inventario')
 
+@login_required
 def eliminar_usuario(request, codigo):
 	alumno = Estudiante.objects.filter(codigo_barras=codigo).first()
 	profe = Maestro.objects.filter(codigo_barras=codigo).first()
@@ -272,7 +290,8 @@ def eliminar_usuario(request, codigo):
 			mensaje = "Usuario no encontrado."
 	return redirect('administrar_perfiles')
 
-
+#Realiza el prestamo. Si es un maestro, es redireccionado a otro para llenar el campo de cantidad.
+@login_required
 @csrf_exempt
 def prestar_view(request):
 	mensaje = None
@@ -298,6 +317,7 @@ def prestar_view(request):
 			mensaje = f"Oops. Hubo un error. Error: {e}"
 	return render(request, "libr/prestamos_menu.html", {"mensaje": mensaje, "es_profe":False})
 
+
 def ver_prestamos(request, codigo):
 	prestamos = None
 	elementos = []
@@ -306,14 +326,10 @@ def ver_prestamos(request, codigo):
 		alumno = Estudiante.objects.filter(codigo_barras=codigo).first()
 		user = profe or alumno
 		if profe:
-			print(profe)
-			#profe = Maestro.objects.get(codigo_barras=codigo)
 			prestamos = Prestamo_Maestro.objects.filter(maestro=profe)
 			for prestamo in prestamos:
 				elementos.append({"tipo": "maestro", "obj":prestamo})
 		elif alumno:
-			print(alumno)
-			#alumno = Estudiante.objects.get(codigo_barras=codigo)
 			prestamos = Prestamo.objects.filter(usuario=alumno)
 			for prestamo in prestamos:
 				elementos.append({"tipo": "alumno", "obj":prestamo})
@@ -323,17 +339,15 @@ def ver_prestamos(request, codigo):
 	return render(request, "libr/libros_prestados.html", {"prestamos": elementos})
 
 
+@login_required
 def prestamo_maestro(request, codigo_libro, codigo_maestro):
-	print("entered")
 	libro = Libro.objects.filter(isbn=codigo_libro).first()
 	profe = Maestro.objects.filter(codigo_barras=codigo_maestro).first()
 	mensaje = None
 	if request.method == "POST":
 		libro1 = request.POST.get("codigo_libro")
-		print(libro1)
 		libroDB = Libro.objects.filter(isbn=libro1).first()
 		user = request.POST.get("codigo_usuario")
-		print(user)
 		profe = Maestro.objects.filter(codigo_barras=user).first()
 		cantidad = request.POST.get("cantidad")
 		try:
@@ -351,10 +365,10 @@ def prestamo_maestro(request, codigo_libro, codigo_maestro):
 				mensaje = "La cantidad es mayor a la registrada en el inventario."
 		else:
 			mensaje = "Uno de los campos está vacío."
-	print(libro)
 	return render(request, "libr/prestamos_menu.html", {"es_profe": True, "profe": profe, "libro": libro, "mensaje":mensaje})
 
 
+#Generera el pdf del inventario.
 def generar_pdf(request):
 	response = HttpResponse(content_type="application/pdf")
 	response['Content-Disposition'] = 'attachment; filename="inventario.pdf"'
@@ -376,61 +390,68 @@ def generar_pdf(request):
 	doc.build(elementos)
 	return response
 
+#Filtra los libros por nombre, autor o isbn.
 def buscar(request):
 	if request.method == "POST":	
 		str = request.POST.get("query")
-		print(str)
 		libro = Libro.objects.filter(Q(autor__icontains=str)| Q(titulo__icontains=str) | Q(isbn__icontains=str))
-		print(libro)
 		if libro.exists():
 			return render(request, "libr/inventario.html", {"libros": libro})
 		else:
 			return render(request, "libr/inventario.html", {"mensaje": "No fue encontrado."})
 	return render(request, "libr/inventario.html")
 
+@login_required
 def opciones_perfiles_view(request):
 	return render(request, "libr/opciones.html")
 
+@login_required
 def agregar_perfil(request, id):
+	mensaje = None
 	if id == 1:
 		if request.method == "POST":
 			nombre = request.POST.get("nombre")
 			grado = request.POST.get("grado")
 			seccion = request.POST.get("seccion")
-			isbn = codes.generar_EAN()
-			while Estudiante.objects.filter(codigo_barras=isbn).exists():
+			if nombre and grado and seccion:
 				isbn = codes.generar_EAN()
-			img = codes.generar_barcode1(isbn, nombre)
-			try:
-				Estudiante.objects.create(nombre=nombre, grado=grado, seccion=seccion, codigo_img=img, codigo_barras=isbn)
-				print("success")
-				est = Estudiante.objects.get(codigo_barras=isbn)
-				return redirect('generar_est_pdf', codigo=isbn)
-			except Exception as e:
-				print(e)
-	
+				while Estudiante.objects.filter(codigo_barras=isbn).exists():
+					isbn = codes.generar_EAN()
+				img = codes.generar_barcode1(isbn, nombre)
+				try:
+					Estudiante.objects.create(nombre=nombre, grado=grado, seccion=seccion, codigo_img=img, codigo_barras=isbn)
+					est = Estudiante.objects.get(codigo_barras=isbn)
+					mensaje = "Perfil agregado exitosamente." 
+					return redirect('generar_est_pdf', codigo=isbn)
+				except Exception as e:
+					mensaje = "Algún campo está vacío o es muy largo."
+			else: 
+				mensaje = "El campo está vacío."
 		form = forms.PresetGrados
-		return render(request, "libr/perfil.html", {"grados": form, "id": id})
+		return render(request, "libr/perfil.html", {"grados": form, "id": id, "mensaje": mensaje})
 	elif id == 2:
 		if request.method == "POST":
 			nombre = request.POST.get("nombre")
-			cb = codes.generar_EAN()
-			while Maestro.objects.filter(codigo_barras=cb).exists():
+			if nombre:
 				cb = codes.generar_EAN()
-			img = codes.generar_barcode1(cb, nombre)
-			try:
-				Maestro.objects.create(nombre=nombre, codigo_img=img, codigo_barras=cb)
-				profe = Maestro.objects.get(codigo_barras=cb)
-				return redirect('generar_est_pdf', codigo=cb)
-			except Exception as e:
-				print(e)
-		return render(request, "libr/perfil.html", {"id": id})
+				while Maestro.objects.filter(codigo_barras=cb).exists():
+					cb = codes.generar_EAN()
+				img = codes.generar_barcode1(cb, nombre)
+				try:
+					Maestro.objects.create(nombre=nombre, codigo_img=img, codigo_barras=cb)
+					profe = Maestro.objects.get(codigo_barras=cb)
+					mensaje = "Perfil agregado exitosamente."
+					return redirect('generar_est_pdf', codigo=cb)
+				except Exception as e:
+					mensaje = "Algún campo está vacío o es muy largo."
+			else:
+				mensaje = "El campo está vacío."
+		return render(request, "libr/perfil.html", {"id": id, "mensaje": mensaje})
 
-
+#Muestra a todos los pefiles
 def admin_view(request):
 	estudiantes = Estudiante.objects.all()
 	profesores = Maestro.objects.all()
-	print(">>> ESTUDIANTES:", [e.nombre for e in estudiantes])
 	elementos = []
 	for maestro in profesores:
 		elementos.append(maestro)
@@ -442,7 +463,7 @@ def admin_view(request):
 	return render(request, "libr/admin.html", {"page_obj": page_obj})
 
 
-
+#Genera el pdf del usuario/perfil y lo guarda como path a la base de datos
 def generar_est_pdf(request, codigo):
 	est = Estudiante.objects.filter(codigo_barras=codigo)
 	profe = Maestro.objects.filter(codigo_barras=codigo)
@@ -466,7 +487,7 @@ def generar_est_pdf(request, codigo):
 			response['Content-Disposition'] = f'attachment; filename="{filename}"'
 			return response
 		except Exception as e:
-			print(e)
+			return messages.error(request, f"Error en la creación del pdf. Error: {e}")
 	elif profe.exists():
 		profe = Maestro.objects.get(codigo_barras=codigo)
 		try:
@@ -485,8 +506,10 @@ def generar_est_pdf(request, codigo):
 			response['Content-Disposition'] = f'attachment; filename="{filename}"'
 			return response
 		except Exception as e:
-			print(e)
+			return messages.error(request, f"Error en la creación del pdf. Error: {e}")
 
+
+@login_required
 def gestionar_perfil(request, codigo):
 	alumno = Estudiante.objects.filter(codigo_barras=codigo)
 	profe = Maestro.objects.filter(codigo_barras=codigo)
@@ -496,7 +519,8 @@ def gestionar_perfil(request, codigo):
 		usuario = Maestro.objects.get(codigo_barras=codigo)
 	return render(request, "libr/gestionar.html", {"usuario": usuario})
 
-#REVISAR
+
+@login_required
 @csrf_exempt
 def modificar_perfiles(request, codigo):
 	est = Estudiante.objects.filter(codigo_barras=codigo)
@@ -510,31 +534,37 @@ def modificar_perfiles(request, codigo):
 	elif profe.exists():
 		usuario = Maestro.objects.get(codigo_barras=codigo)
 	if request.method == "POST" and est.exists():
-		try:
-			nombre = request.POST.get("nombre")
-			grado = request.POST.get("grado")
-			seccion = request.POST.get("seccion")
-			usuario.nombre = nombre
-			usuario.grado = grado
-			usuario.seccion = seccion
-			print(usuario.nombre)
-			usuario.save()
-			messages.success(request, "Actualización realizada exitosamente...")
-			return redirect('administrar_perfiles')
-		except Exception as e:
-			print(e)
+		
+		nombre = request.POST.get("nombre")
+		grado = request.POST.get("grado")
+		seccion = request.POST.get("seccion")
+		if nombre and grado and seccion:
+			try:
+				usuario.nombre = nombre
+				usuario.grado = grado
+				usuario.seccion = seccion
+			
+				usuario.save()
+				return redirect('administrar_perfiles')
+			except Exception as e:
+				messages.error(request, f"Error: {e}")
+		else:
+			messages.error(request, "Hay algún campo vacío.")
 	elif request.method == "POST" and profe.exists():
-		try:
-			nombre = request.POST.get("nombre")
-			usuario.nombre = nombre
-			usuario.save()
-			messages.success(request, "Actualización realizada exitosamente...")
-			return redirect('administrar_perfiles')
-		except Exception as e:
-			print(e)
+		nombre = request.POST.get("nombre")
+		if nombre:
+			try:
+				usuario.nombre = nombre
+				usuario.save()
+				return redirect('administrar_perfiles')
+			except Exception as e:
+				messages.error(request, f"Error: {e}")
+		else:
+			messages.error(request, "Un campo está vacío.")
 	return render(request, "libr/mod_user.html", {"usuario": usuario, "grados": form})
 
 
+@login_required
 def mostrar_pdf(request, codigo):
 	alumno = Estudiante.objects.filter(codigo_barras=codigo).first()
 	maestro = Maestro.objects.filter(codigo_barras=codigo).first()
@@ -572,6 +602,7 @@ def prestamos_view(request):
 	elementos = p.get_page(page)
 	return render(request, "libr/prestamos.html", {"prestamos": elementos})
 
+@login_required
 def devolver(request,tipo, id):
 	p = None
 	if tipo == "alumno":
@@ -586,13 +617,13 @@ def devolver(request,tipo, id):
 		print(e)
 	return redirect('prestamos_view')
 
-
+@login_required
 @csrf_exempt
 def borrar_historial(request):
 	try:
 		p1 = Prestamo.objects.all().delete()
 		p2 = Prestamo_Maestro.objects.all().delete()
-		messages.success(request, "✅ Historial borrado correctamente.")
+		messages.success(request, "Historial borrado correctamente.")
 	except Exception as e:
 		print(e)
 	return redirect('prestamos_view')

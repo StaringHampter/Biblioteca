@@ -11,9 +11,9 @@ class User(AbstractUser):
 
 
 class Libro(models.Model):
-	titulo = models.CharField(max_length=100)
-	autor = models.CharField(max_length=30)
-	isbn = models.CharField(max_length=100)
+	titulo = models.CharField(max_length=150)
+	autor = models.CharField(max_length=150)
+	isbn = models.CharField(max_length=13)
 	año = models.IntegerField(blank=True, null=True)
 	link = models.CharField(max_length=150)
 	cantidad = models.IntegerField()
@@ -24,13 +24,13 @@ class Libro(models.Model):
 		return self.titulo + " " + f"de " + self.autor
 
 class Maestro(models.Model):
-	nombre = models.CharField(max_length=100)
-	codigo_barras = models.CharField(max_length=100)
+	nombre = models.CharField(max_length=150)
+	codigo_barras = models.CharField(max_length=13)
 	codigo_img = models.ImageField(upload_to="codigos/", null=True, blank=True)
 	pdf = models.FileField(upload_to="fichas/", null=True, blank=True)
 
 class Estudiante(models.Model):
-	nombre = models.CharField(max_length=100)
+	nombre = models.CharField(max_length=150)
 	grados = [("kinder", "Kinder"), ("preparatoria","Preparatoria"), ("primero primaria","Primero Primaria"), ("segundo primaria","Segundo Primaria"),
 	("tercero primaria", "Tercero Primaria"), ("cuarto primaria", "Cuarto Primaria"), ("quinto primaria", "Quinto Primaria"), 
 	("sexto primaria", "Sexto Primaria"), ("primero básico", "Primero Básico"), ("segundo básico", "Segundo Básico"),
@@ -41,7 +41,7 @@ class Estudiante(models.Model):
 	secciones = [("a", "A"),("b", "B")]
 	grado = models.CharField(max_length=50, choices=grados)
 	seccion = models.CharField(max_length=1, choices=secciones)
-	codigo_barras = models.CharField(max_length=100)
+	codigo_barras = models.CharField(max_length=13)
 	codigo_img = models.ImageField(upload_to="codigos/", null=True, blank=True)
 	pdf = models.FileField(upload_to="fichas/", null=True, blank=True)
 
